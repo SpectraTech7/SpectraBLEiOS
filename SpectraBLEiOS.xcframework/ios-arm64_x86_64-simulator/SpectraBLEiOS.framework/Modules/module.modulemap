@@ -1,0 +1,6 @@
+framework module SpectraBLEiOS {
+  umbrella header "SpectraBLEiOS.h"
+  export *
+
+  module * { export * }
+}
