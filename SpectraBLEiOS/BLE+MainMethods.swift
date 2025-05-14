@@ -485,7 +485,7 @@ extension SpectraBLE {
             
             if device.getDeviceType() == DeviceType.XP_PLUS.rawValue ||  device.getDeviceType() == DeviceType.XP_READER_NEW_MTU.rawValue || device.getDeviceType() == DeviceType.XP_PRO_HID.rawValue || device.getDeviceType() == DeviceType.XP_PRO_SPECTRA.rawValue
             {
-                return -50
+                return -43
             }
             else if device.getDeviceType() == DeviceType.BST3S.rawValue || device.getDeviceType() == DeviceType.BSC3S.rawValue || device.getDeviceType() == DeviceType.UST3S.rawValue
             {
@@ -504,7 +504,7 @@ extension SpectraBLE {
         case 2:
             if device.getDeviceType() == DeviceType.XP_PLUS.rawValue ||  device.getDeviceType() == DeviceType.XP_READER_NEW_MTU.rawValue || device.getDeviceType() == DeviceType.XP_PRO_HID.rawValue || device.getDeviceType() == DeviceType.XP_PRO_SPECTRA.rawValue
             {
-                return -56
+                return -49
             }
             else if device.getDeviceType() == DeviceType.BST3S.rawValue || device.getDeviceType() == DeviceType.BSC3S.rawValue || device.getDeviceType() == DeviceType.UST3S.rawValue
             {
@@ -524,7 +524,7 @@ extension SpectraBLE {
             
             if device.getDeviceType() == DeviceType.XP_PLUS.rawValue || device.getDeviceType() == DeviceType.XP_READER_NEW_MTU.rawValue || device.getDeviceType() == DeviceType.XP_PRO_HID.rawValue || device.getDeviceType() == DeviceType.XP_PRO_SPECTRA.rawValue
             {
-                return -63
+                return -56
             }
             else if device.getDeviceType() == DeviceType.BST3S.rawValue || device.getDeviceType() == DeviceType.BSC3S.rawValue || device.getDeviceType() == DeviceType.UST3S.rawValue
             {
