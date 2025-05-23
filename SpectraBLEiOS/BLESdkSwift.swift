@@ -154,11 +154,20 @@ class BLETapAndGodDefaultValue {
         }
     }
     
+    var isHaveAdditionalInfo: Int {
+        set {
+            UserDefaults.standard.setValue(newValue, forKey: "com.spectra.ble.isHaveAdditionalInfo")
+        } get {
+            return UserDefaults.standard.integer(forKey: "com.spectra.ble.isHaveAdditionalInfo")
+        }
+    }
+    
     func removeAllStoreProperties() {
         UserDefaults.standard.removeObject(forKey: "com.spectra.ble.DestinationFloor")
         UserDefaults.standard.removeObject(forKey: "com.spectra.ble.BoardingFloor")
         UserDefaults.standard.removeObject(forKey: "com.spectra.ble.selectedFloor")
         UserDefaults.standard.removeObject(forKey: "com.spectra.ble.sensitivity")
         UserDefaults.standard.removeObject(forKey: "com.spectra.ble.shouldAllowPunch")
+        UserDefaults.standard.removeObject(forKey: "com.spectra.ble.isHaveAdditionalInfo")
     }
 }

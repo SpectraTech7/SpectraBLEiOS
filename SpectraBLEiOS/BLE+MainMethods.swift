@@ -305,6 +305,8 @@ extension SpectraBLE {
             BLETapAndGodDefaultValue.shared.tapAndGoDestinationFloor = 0
             BLETapAndGodDefaultValue.shared.tapAndGoSelectedFloor = 0
             BLETapAndGodDefaultValue.shared.tapAndGoBoardingFloor = 0
+            BLETapAndGodDefaultValue.shared.isHaveAdditionalInfo = 0
+            
             
             return
         }
@@ -328,10 +330,13 @@ extension SpectraBLE {
                     }
                 }
             }
+            BLETapAndGodDefaultValue.shared.isHaveAdditionalInfo = 1
+            
         } else {
             BLETapAndGodDefaultValue.shared.tapAndGoDestinationFloor = 0
             BLETapAndGodDefaultValue.shared.tapAndGoBoardingFloor = 0
             BLETapAndGodDefaultValue.shared.tapAndGoSelectedFloor = 0
+            BLETapAndGodDefaultValue.shared.isHaveAdditionalInfo = 0
         }
 
         BLETapAndGodDefaultValue.shared.tagId = bleTag
@@ -392,12 +397,7 @@ extension SpectraBLE {
     
     // TODO: START SCANNING CALL
     public func startScan(callback: @escaping (BLEEvent, Any) -> Void) {
-        self.tagId = BLETapAndGodDefaultValue.shared.tagId
-        self.tapAndGoBoardingFloor = BLETapAndGodDefaultValue.shared.tapAndGoBoardingFloor
-        self.tapAndGoSelectedFloor = BLETapAndGodDefaultValue.shared.tapAndGoSelectedFloor
-        self.tapAndGoDestinationFloor = BLETapAndGodDefaultValue.shared.tapAndGoDestinationFloor
-        self.sensitityLevel = BLETapAndGodDefaultValue.shared.sensitivity
-        
+
         scanQueue.async { [weak self] in
             guard let self = self else { return }
             
@@ -410,9 +410,23 @@ extension SpectraBLE {
                                                        ])
             }
             
-            if self.error != nil {
-                return
-            }
+            // Check for initialization error
+               if self.error != nil {
+                   let logMessage = "❌ Scanner failed to start due to error: \(String(describing: self.error))\n"
+                   LogManager.shared.writeLog(logMessage)
+                   
+                   // Stop scanning if somehow started
+                   self.centralManager?.stopScan()
+                   
+                   // Retry after 10 milliseconds
+                   DispatchQueue.global().asyncAfter(deadline: .now() + 0.010) {
+                       LogManager.shared.writeLog("🔁 Retrying BLE scan after 10 ms...\n")
+                       self.startScan(callback: callback)
+                   }
+                   return
+               }
+            
+            
                     
             self.centralManager?.scanForPeripherals(
                 withServices: [CBUUID(string: DeviceConstant.CDeviceUDID)],

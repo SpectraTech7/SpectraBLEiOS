@@ -53,47 +53,93 @@ class BLEEncryption {
             return ""
         }
         
-        let iTagId = UInt32(tagId) ?? 0
-        let iDestFloor = UInt8(destinationFloor) ?? 0
-        let iBoardFloor = UInt8(boardingFloor) ?? 0
-        let iSelecFloor = UInt8(selectedFloor) ?? 0
         
-        var tagBytes: [UInt8] = [
-            UInt8(iTagId & 0xFF),
-            UInt8((iTagId >> 8) & 0xFF),
-            UInt8((iTagId >> 16) & 0xFF),
-            UInt8((iTagId >> 24) & 0xFF),
-            iDestFloor,
-            iBoardFloor,
-            iSelecFloor
-        ]
-        
-        var arrBytes = [UInt8](repeating: 0, count: 32)
-        arrBytes[0] = 0xAA
-        arrBytes[1] = 19
-        arrBytes[3] = 1
-        arrBytes[5] = 1
-        arrBytes[6] = 0xB0
-        arrBytes[7] = 1
-        arrBytes[8] = UInt8(tagBytes.count)
-        arrBytes[9] = 0
-        
-        arrBytes.replaceSubrange(10..<(10 + tagBytes.count), with: tagBytes)
-        
-        let p = 10 + tagBytes.count
-        arrBytes[p] = calculateLRC(dataPtr: arrBytes, length: p)
-        arrBytes[p + 1] = 0xBB
-        
-        let dataToEncrypt = Data(arrBytes)
-        let encryptedData = AES128Encrypt(dataToEncrypt)
-        
-        var result = encryptedData.base64EncodedString()
-        
-        if let deviceType = deviceType, ["01", "07", "1", "7"].contains(deviceType) {
-            result = "\r\n" + result + "\r\n"
+        if BLETapAndGodDefaultValue.shared.isHaveAdditionalInfo == 1
+        {
+            let iTagId = UInt32(tagId) ?? 0
+            let iDestFloor = UInt8(destinationFloor) ?? 0
+            let iBoardFloor = UInt8(boardingFloor) ?? 0
+            let iSelecFloor = UInt8(selectedFloor) ?? 0
+            
+            var tagBytes: [UInt8] = [
+                UInt8(iTagId & 0xFF),
+                UInt8((iTagId >> 8) & 0xFF),
+                UInt8((iTagId >> 16) & 0xFF),
+                UInt8((iTagId >> 24) & 0xFF),
+                iDestFloor,
+                iBoardFloor,
+                iSelecFloor
+            ]
+            
+            var arrBytes = [UInt8](repeating: 0, count: 32)
+            arrBytes[0] = 0xAA
+            arrBytes[1] = 19
+            arrBytes[3] = 1
+            arrBytes[5] = 1
+            arrBytes[6] = 0xB0
+            arrBytes[7] = 1
+            arrBytes[8] = UInt8(tagBytes.count)
+            arrBytes[9] = 0
+            
+            
+            arrBytes.replaceSubrange(10..<(10 + tagBytes.count), with: tagBytes)
+            
+            let p = 10 + tagBytes.count
+            arrBytes[p] = calculateLRC(dataPtr: arrBytes, length: p)
+            arrBytes[p + 1] = 0xBB
+            
+            let dataToEncrypt = Data(arrBytes)
+            let encryptedData = AES128Encrypt(dataToEncrypt)
+            
+            var result = encryptedData.base64EncodedString()
+            
+            if let deviceType = deviceType, ["01", "07", "1", "7"].contains(deviceType) {
+                result = "\r\n" + result + "\r\n"
+            }
+            
+            return result
         }
-        
-        return result
+        else
+        {
+           let iTagId = UInt32(tagId) ?? 0
+          
+           var tagBytes = [UInt8](repeating: 0, count: 8)
+              tagBytes[0] = UInt8(iTagId & 0xFF)
+              tagBytes[1] = UInt8((iTagId >> 8) & 0xFF)
+              tagBytes[2] = UInt8((iTagId >> 16) & 0xFF)
+              tagBytes[3] = UInt8((iTagId >> 24) & 0xFF)
+           
+           // 3. Create and fill arrBytes with header and payload
+           var arrBytes = [UInt8](repeating: 0, count: 32)
+           arrBytes[0] = 0xAA
+           arrBytes[1] = 20
+           arrBytes[2] = 0
+           arrBytes[3] = 1
+           arrBytes[4] = 1
+           arrBytes[5] = 1
+           arrBytes[6] = 0xB0
+           arrBytes[7] = 1
+           arrBytes[8] = UInt8(tagBytes.count)
+           arrBytes[9] = 0
+            
+            
+            arrBytes.replaceSubrange(10..<(10 + tagBytes.count), with: tagBytes)
+            
+            let p = 10 + tagBytes.count
+            arrBytes[p] = calculateLRC(dataPtr: arrBytes, length: p)
+            arrBytes[p + 1] = 0xBB
+            
+            let dataToEncrypt = Data(arrBytes)
+            let encryptedData = AES128Encrypt(dataToEncrypt)
+            
+            var result = encryptedData.base64EncodedString()
+            
+            if let deviceType = deviceType, ["01", "07", "1", "7"].contains(deviceType) {
+                result = "\r\n" + result + "\r\n"
+            }
+            
+            return result
+        }
     }
     
     

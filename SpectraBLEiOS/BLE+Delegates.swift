@@ -12,18 +12,32 @@ extension SpectraBLE: CBCentralManagerDelegate {
     
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
-        if self.error != nil {
-            bleManagerDelegate?.onScanFailure(error: error!)
-            return
-        }
-        
-        if central.state == .poweredOn {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        switch central.state {
+        case .poweredOn:
+            // Safe to scan
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.005) { [weak self] in
                        guard let self = self, let callback = self.globalCallback else {
                            return
                        }
                        self.startScan(callback: callback) // Explicitly using 'self'
                 }
+            break
+        case .unauthorized, .unsupported, .poweredOff, .resetting:
+            LogManager.shared.writeLog("❌ BLE is not available. State: \(central.state.rawValue)\n")
+        default:
+            break
+        }
+        
+        if let error = self.error {
+            // Log the error
+            LogManager.shared.writeLog("❌ Scan failed due to error: \(error.errorMessage)\n")
+            
+            // Notify the delegate
+            bleManagerDelegate?.onScanFailure(error: error)
+            
+            // Optionally stop any ongoing scan (as safety)
+            self.centralManager?.stopScan()
+            
         }
     }
     
